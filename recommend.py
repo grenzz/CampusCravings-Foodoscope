@@ -13,5 +13,6 @@ def recommend(user_text, state, top_k=5):
 
     scored.sort(reverse=True, key=lambda x: x[0])
 
-    return [r[1] for r in scored[:top_k]]
+    return [r[1].to_dict() for r in scored[:top_k]]
+
 
