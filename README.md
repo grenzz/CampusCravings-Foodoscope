@@ -14,6 +14,9 @@ personalized, and flavor-optimized meal suggestions.
 ## APIs Used
 - RecipeDB
 - FlavorDB
+- 
+## Status
+Work in progress for the FoodoScope API Hackathon.
 
 ## Team
 Shaurya Pratap Singh
