@@ -1,15 +1,43 @@
+import torch
 from sentence_transformers import SentenceTransformer
 import pickle
 from data_loader import load_recipes
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+MODEL_NAME = "all-MiniLM-L6-v2"
+EMBED_PATH = "recipe_embeddings.pkl"
 
+# ---------------------------
+# 🔥 Detect GPU automatically
+# ---------------------------
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using device: {device}")
+
+model = SentenceTransformer(MODEL_NAME, device=device)
+
+# ---------------------------
+# Load dataset
+# ---------------------------
 df = load_recipes()
 
-embeddings = model.encode(df["text"].tolist(), show_progress_bar=True)
+texts = df["text"].tolist()
 
-with open("recipe_embeddings.pkl", "wb") as f:
+# ---------------------------
+# 🚀 Fast encoding
+# ---------------------------
+embeddings = model.encode(
+    texts,
+    batch_size=256,                # 🚀 GPU optimized
+    show_progress_bar=True,
+    convert_to_numpy=True,         # faster storage
+    normalize_embeddings=True      # faster cosine later
+)
+
+# ---------------------------
+# Save
+# ---------------------------
+with open(EMBED_PATH, "wb") as f:
     pickle.dump((df, embeddings), f)
 
-print("Embeddings built.")
+print("Embeddings built successfully.")
+
  

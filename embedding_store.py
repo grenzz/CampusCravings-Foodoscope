@@ -6,13 +6,21 @@ from sentence_transformers import SentenceTransformer
 MODEL_NAME = "all-MiniLM-L6-v2"
 EMBED_PATH = "recipe_embeddings.pkl"
 
-model = SentenceTransformer(MODEL_NAME)
+import torch
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = SentenceTransformer(MODEL_NAME, device=device)
+
+print(f"Using device: {device}")
+
 
 
 def load_full_recipes():
     df = pd.read_csv("RAW_recipes.csv")
 
-    df = df[["name", "minutes", "ingredients"]].dropna()
+    df = df[
+        ["name", "minutes", "ingredients", "steps", "description", "tags", "nutrition"]
+    ].dropna()
 
     def safe_parse(x):
         try:
@@ -21,6 +29,9 @@ def load_full_recipes():
             return []
 
     df["ingredients"] = df["ingredients"].apply(safe_parse)
+    df["steps"] = df["steps"].apply(safe_parse)
+    df["tags"] = df["tags"].apply(safe_parse)
+    df["nutrition"] = df["nutrition"].apply(safe_parse)
 
     df["text"] = df.apply(
         lambda r: r["name"] + " " + " ".join(r["ingredients"]),
